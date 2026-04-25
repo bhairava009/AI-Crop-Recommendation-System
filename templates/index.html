@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | SmartCrop{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-agri-green text-white py-20 px-4 mb-12 text-center shadow-inner">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-6">AI-Powered Farming Insights</h1>
+        <p class="text-lg md:text-xl mb-10 text-green-100">Upload a soil image and let our AI predict NPK values, fetch live weather, and recommend the most profitable crop for your land.</p>
+        <a href="{{ url_for('predict') }}" class="px-8 py-4 bg-white text-agri-green font-bold rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1 inline-block">
+            Start Prediction Now
+        </a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="max-w-6xl mx-auto px-4 mb-20">
+    <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Why Use SmartCrop?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-agri-green mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Soil Image Analysis</h3>
+            <p class="text-gray-600">State-of-the-art CNN models accurately classify your soil type from just a photo.</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+            <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Live Weather Data</h3>
+            <p class="text-gray-600">Integrates with OpenWeather API to account for local temperature and rainfall probabilities.</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+            <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><polyline points="12 22 12 12"></polyline><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline></svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Smart Rotation</h3>
+            <p class="text-gray-600">Provide your previous crop so our logic service can encourage healthy crop rotation.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
