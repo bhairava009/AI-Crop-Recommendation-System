@@ -9,7 +9,7 @@ if os.path.exists(model_path):
 else:
     crop_model = None
 
-def predict_crop_top5(N, P, K, temp, humidity, rainfall, variety_mode="normal"):
+def predict_crop_top5(N, P, K, temp, humidity, rainfall, ph=6.5, variety_mode="normal"):
     """
     Predicts top 5 crops with configurable variety.
     
@@ -22,15 +22,31 @@ def predict_crop_top5(N, P, K, temp, humidity, rainfall, variety_mode="normal"):
         return [("Model not found", 0)]
 
     import pandas as pd
-    # Wrap in DataFrame to ensure the Scaler Pipeline maps feature headers natively without warnings
-    data = pd.DataFrame(
-        [[N, P, K, temp, humidity, rainfall]],
-        columns=['N', 'P', 'K', 'temperature', 'humidity', 'rainfall']
-    )
+    
+    # Check how many features the model expects
+    expected_features = getattr(crop_model.named_steps['scaler'], 'n_features_in_', 7)
+    
+    if expected_features == 6:
+        # Create input dataframe without 'ph'
+        data = pd.DataFrame([[N, P, K, temp, humidity, rainfall]], 
+                            columns=['N', 'P', 'K', 'temperature', 'humidity', 'rainfall'])
+    else:
+        # Create input dataframe to preserve feature names for StandardScaler
+        data = pd.DataFrame([[N, P, K, temp, humidity, ph, rainfall]], 
+                            columns=['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall'])
     
     probs = crop_model.predict_proba(data)[0]
-    classes = crop_model.classes_
-
+    classes = crop_model.named_steps['classifier'].classes_
+    
+    # User requested to never suggest muskmelon
+    muskmelon_idx = np.where(classes == 'muskmelon')[0]
+    if len(muskmelon_idx) > 0:
+        probs[muskmelon_idx[0]] = 0.0
+        
+    # Add a small epsilon to avoid ValueError in np.random.choice when prob is 0
+    probs = probs + 1e-4
+    probs = probs / np.sum(probs)
+    
     num_samples = min(5, len(classes))
     
     if variety_mode == "extreme":

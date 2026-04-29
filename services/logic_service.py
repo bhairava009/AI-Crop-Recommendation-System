@@ -26,7 +26,10 @@ def predict_npk(soil_type):
         return 50, 50, 50
         
     try:
-        soil_enc = label_encoder.transform([soil_type])[0]
+        # CNN soil names perfectly match NPK dataset names now!
+        # CNN outputs like "Sandy Soil" or "loamy soil", but the NPK dataset expects "Sandy" or "Loamy"
+        cleaned_soil = soil_type.lower().replace(" soil", "").strip().capitalize()
+        soil_enc = label_encoder.transform([cleaned_soil])[0]
         
         # Predict the robust median baseline for this soil type
         npk = npk_model.predict([[soil_enc]])[0]
@@ -36,7 +39,7 @@ def predict_npk(soil_type):
         baseline_p = npk[1] * np.random.uniform(0.85, 1.15)
         baseline_k = npk[2] * np.random.uniform(0.85, 1.15)
         
-        return int(baseline_n), int(baseline_p), int(baseline_k)
+        return round(float(baseline_n), 2), round(float(baseline_p), 2), round(float(baseline_k), 2)
     except Exception as e:
         print("Error predicting NPK:", e)
         # Fallback if unknown soil type or error

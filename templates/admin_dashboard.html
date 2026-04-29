@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | SmartCrop{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-8 px-4">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-gray-900 px-6 py-8 text-white flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold flex items-center">
+                    <svg class="w-8 h-8 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    System Administration
+                </h1>
+                <p class="text-gray-400 mt-2">Manage users and system resources.</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-4 text-center border border-gray-700">
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total Users</p>
+                <p class="text-3xl font-bold text-blue-400">{{ users|length }}</p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Registered Users</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600 border-b-2 border-gray-200">
+                            <th class="py-3 px-4 font-semibold text-sm">ID</th>
+                            <th class="py-3 px-4 font-semibold text-sm">Username</th>
+                            <th class="py-3 px-4 font-semibold text-sm">Role</th>
+                            <th class="py-3 px-4 font-semibold text-sm">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        {% for u in users %}
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                            <td class="py-3 px-4 font-mono text-sm text-gray-500">#{{ u.id }}</td>
+                            <td class="py-3 px-4 font-medium">{{ u.username }}</td>
+                            <td class="py-3 px-4">
+                                {% if u.role == 'admin' %}
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Admin</span>
+                                {% else %}
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-bold rounded-full">User</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="flex items-center text-sm text-green-600">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Active
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="py-8 text-center text-gray-500">No users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

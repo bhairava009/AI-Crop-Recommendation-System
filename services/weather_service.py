@@ -9,14 +9,15 @@ def get_weather_by_coords(lat, lon):
     # Current weather
     url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
     try:
-        data = requests.get(url).json()
+        # Added strict timeout to prevent hanging the web app if the weather API is slow
+        data = requests.get(url, timeout=5).json()
         temp = data['main']['temp']
         humidity = data['main']['humidity']
         city = data.get("name", "Unknown")
 
         # Forecast rainfall for next few hours
         forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
-        forecast = requests.get(forecast_url).json()
+        forecast = requests.get(forecast_url, timeout=5).json()
         
         rainfall = 0
         if 'list' in forecast:
