@@ -83,7 +83,12 @@ def predict_soil(img_path):
         
         # Predict
         prediction = cnn_model.predict(img_batch, verbose=0)
+        max_prob = float(np.max(prediction[0]))
         predicted_class_idx = np.argmax(prediction[0])
+        
+        # Confidence Threshold Check to reject non-soil images
+        if max_prob < 0.50:
+            return "Not a Soil Image"
         
         # Map back to string
         predicted_label = inverse_class_indices.get(predicted_class_idx, "Unknown")

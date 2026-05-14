@@ -1,5 +1,8 @@
 import os
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file
+import pandas as pd
+import io
+import re
 
 # Services
 from services.auth_service import login_user, signup_user, create_admin_if_not_exists, get_all_users
@@ -7,6 +10,8 @@ from services.image_service import validate_image, predict_soil
 from services.logic_service import predict_npk, apply_previous_crop_logic, classify_weather
 from services.weather_service import get_weather_by_coords
 from services.crop_service import predict_crop_top5
+from services.history_service import save_prediction, get_user_history, clear_user_history
+from services.contact_service import save_message, get_all_messages
 
 app = Flask(__name__)
 app.secret_key = "smartcropsecret123"
@@ -38,7 +43,15 @@ def contact():
         subject = request.form.get('subject')
         message = request.form.get('message')
         
-        # Here we could save to DB, but for now we just flash success
+        # Email validation
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            flash("Invalid email format. Please provide a valid email address.", "error")
+            return redirect(url_for('contact'))
+
+        # Save message to DB
+        save_message(name, email, subject, message)
+        
         flash("Thank you for reaching out! We'll get back to you soon.", "success")
         return redirect(url_for('contact'))
         
@@ -97,7 +110,8 @@ def admin_dashboard():
         return redirect(url_for('admin_login'))
     
     users = get_all_users()
-    return render_template('admin_dashboard.html', users=users)
+    messages = get_all_messages()
+    return render_template('admin_dashboard.html', users=users, messages=messages)
 
 @app.route('/logout')
 def logout():
@@ -136,6 +150,12 @@ def predict():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         soil = predict_soil(filepath)
+        
+        if soil == "Not a Soil Image" or soil == "Unknown":
+            os.remove(filepath) # Clean up the invalid image
+            flash("The uploaded image does not appear to be a valid soil image. Please upload a clear picture of soil.", 'error')
+            return redirect(request.url)
+            
         image_url = f'static/uploads/{file.filename}'
 
     # User inputs
@@ -164,6 +184,10 @@ def predict():
     
     crops = predict_crop_top5(N, P, K, temp, humidity, rainfall, variety_mode="extreme")
     crops = apply_previous_crop_logic(crops, previous_crop)
+    
+    # Save to history
+    top_crop = crops[0][0] if crops else 'Unknown'
+    save_prediction(session['user'], soil, N, P, K, temp, humidity, rainfall, top_crop)
 
     return render_template(
         'result.html',
@@ -174,6 +198,54 @@ def predict():
         weather_tag=weather_classification,
         crops=crops
     )
+
+@app.route('/history')
+def history():
+    if 'user' not in session:
+        flash("Please log in to view your history.", "error")
+        return redirect(url_for('login'))
+        
+    user_history = get_user_history(session['user'])
+    return render_template('history.html', history=user_history)
+
+@app.route('/history/export')
+def export_history():
+    if 'user' not in session:
+        flash("Please log in to export your history.", "error")
+        return redirect(url_for('login'))
+        
+    user_history = get_user_history(session['user'])
+    if not user_history:
+        flash("No history available to export.", "error")
+        return redirect(url_for('history'))
+        
+    df = pd.DataFrame(user_history)
+    
+    # Format dataframe nicely
+    df.columns = ['Timestamp', 'Soil Type', 'Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)', 'Temperature (°C)', 'Humidity (%)', 'Rainfall (mm)', 'Top Crop']
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Prediction History')
+        
+    output.seek(0)
+    
+    return send_file(
+        output,
+        download_name=f"smartcrop_history_{session['user']}.xlsx",
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+@app.route('/history/clear', methods=['POST'])
+def clear_history():
+    if 'user' not in session:
+        flash("Please log in to clear your history.", "error")
+        return redirect(url_for('login'))
+        
+    clear_user_history(session['user'])
+    flash("Your history has been successfully cleared.", "success")
+    return redirect(url_for('history'))
 
 if __name__ == "__main__":
     app.run(debug=True)

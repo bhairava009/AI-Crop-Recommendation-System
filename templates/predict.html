@@ -19,7 +19,8 @@
                     d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
-            <p class="text-gray-600 font-medium cursor-pointer">Click to upload a soil image (Optional if NPK provided)</p>
+            <p class="text-gray-600 font-medium cursor-pointer">Click to upload a soil image (Optional if NPK provided)
+            </p>
             <p class="text-xs text-gray-500 mt-1">PNG, JPG, JPEG up to 5MB</p>
             <input type="file" id="imageUpload" name="image" class="hidden" accept="image/*"
                 onchange="previewImage(event)">
@@ -36,7 +37,8 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="col-span-1 md:col-span-3 mb-[-1rem]">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Manual NPK Values (Optional)</label>
-                <p class="text-xs text-gray-500">If you know your exact NPK values, enter them to bypass image analysis.</p>
+                <p class="text-xs text-gray-500">If you know your exact NPK values, enter them to bypass image analysis.
+                </p>
             </div>
             <div>
                 <input type="number" step="any" id="manual_n" name="manual_n" placeholder="Nitrogen (N)"
