@@ -48,15 +48,20 @@ def load_models_if_needed():
             json_path = os.path.join(base_dir, 'soil_class_indices.json')
             
             if os.path.exists(model_path) and os.path.exists(json_path):
-                cnn_model = load_model(model_path)
-                with open(json_path, 'r') as f:
-                    class_indices = json.load(f)
-                # Map integer to class string (e.g., 0 -> "Clay")
-                inverse_class_indices = {v: k for k, v in class_indices.items()}
+                try:
+                    cnn_model = load_model(model_path)
+                    with open(json_path, 'r') as f:
+                        class_indices = json.load(f)
+                    # Map integer to class string (e.g., 0 -> "Clay")
+                    inverse_class_indices = {v: k for k, v in class_indices.items()}
+                    print("CNN model loaded successfully.")
+                except Exception as e:
+                    print(f"ERROR loading CNN model: {type(e).__name__}: {e}")
             else:
-                print("CNN model or class mapping JSON not found.")
+                print(f"CNN model or JSON not found. model_path={model_path}, json_path={json_path}")
+                print(f"model exists: {os.path.exists(model_path)}, json exists: {os.path.exists(json_path)}")
         except Exception as e:
-            print(f"Error loading CNN model: {e}")
+            print(f"Error importing tensorflow or loading CNN model: {type(e).__name__}: {e}")
 
 def predict_soil(img_path):
     """
