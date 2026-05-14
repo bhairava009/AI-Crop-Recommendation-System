@@ -1,7 +1,7 @@
 flask
 gunicorn
 tensorflow==2.13.0
-numpy==1.26.4
+numpy==1.24.3
 pandas
 pillow
 scikit-learn
