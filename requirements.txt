@@ -1,8 +1,8 @@
-tensorflow>=2.15.0
-keras>=2.10.0
+flask
+gunicorn
+tensorflow-cpu==2.15.0
 numpy
 pandas
-flask
 pillow
 scikit-learn
 matplotlib
