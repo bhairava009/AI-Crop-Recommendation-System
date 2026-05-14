@@ -49,19 +49,24 @@ def load_models_if_needed():
             
             if os.path.exists(model_path) and os.path.exists(json_path):
                 try:
-                    cnn_model = load_model(model_path)
+                    # Try tf.keras first (TF < 2.16), fall back to standalone keras
+                    try:
+                        from tensorflow.keras.models import load_model
+                    except ImportError:
+                        from keras.models import load_model
+                    
+                    cnn_model = load_model(model_path, compile=False)
                     with open(json_path, 'r') as f:
                         class_indices = json.load(f)
-                    # Map integer to class string (e.g., 0 -> "Clay")
                     inverse_class_indices = {v: k for k, v in class_indices.items()}
-                    print("CNN model loaded successfully.")
+                    print(f"CNN model loaded OK. Classes: {list(inverse_class_indices.values())}")
                 except Exception as e:
                     print(f"ERROR loading CNN model: {type(e).__name__}: {e}")
             else:
-                print(f"CNN model or JSON not found. model_path={model_path}, json_path={json_path}")
-                print(f"model exists: {os.path.exists(model_path)}, json exists: {os.path.exists(json_path)}")
+                print(f"[DIAG] model exists={os.path.exists(model_path)}, json exists={os.path.exists(json_path)}")
+                print(f"[DIAG] model_path={model_path}")
         except Exception as e:
-            print(f"Error importing tensorflow or loading CNN model: {type(e).__name__}: {e}")
+            print(f"[DIAG] TF import failed: {type(e).__name__}: {e}")
 
 def predict_soil(img_path):
     """
