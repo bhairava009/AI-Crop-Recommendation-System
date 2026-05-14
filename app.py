@@ -14,7 +14,7 @@ from services.history_service import save_prediction, get_user_history, clear_us
 from services.contact_service import save_message, get_all_messages
 
 app = Flask(__name__)
-app.secret_key = "smartcropsecret123"
+app.secret_key = os.environ.get("SECRET_KEY", "smartcropsecret123")
 
 # Upload folder
 UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static', 'uploads')
