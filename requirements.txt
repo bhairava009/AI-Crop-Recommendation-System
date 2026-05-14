@@ -1,6 +1,6 @@
 flask
 gunicorn
-tensorflow-cpu
+tensorflow==2.13.0
 numpy
 pandas
 pillow
